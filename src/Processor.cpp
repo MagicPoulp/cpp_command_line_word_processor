@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cmath>
 #include <algorithm>
+#include <unordered_set>
 #include <boost/algorithm/string.hpp>
 
 #include "Processor.hpp"
@@ -71,7 +72,10 @@ namespace
   bool compareStringSizeDesc(string s1, string s2) { return !compareStringSize(s1, s2); }
 }
 
-
+// the strategy pattern is used here, to decouple the algorithm from the client, and change teh algorithm at runtime.
+// but the patterm is not fully used since we do not have separate classes for each strategy
+// This allows to have less strategies to support (one for each combination of sort, sort descending, filter duplicates).
+// We could make classes to make sure evolutions do not touch classes, and do not break SOLID's Open/Close
 void Processor::processOneTransformStep(vector<string>& inputData, processor_step step) {
   switch (step) {
   case SORT_ASC:
@@ -83,12 +87,34 @@ void Processor::processOneTransformStep(vector<string>& inputData, processor_ste
     sort(inputData.begin(), inputData.end(), ::compareStringSizeDesc);
     break;
   case DISTINCT:
-    cout << "filter out duplicates" << endl;
-    // 3 ways work better depending on number of duplicates
-    // https://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
-    // Once all duplicate elements are shifted at one end of vector, then delete them using the vector::erase()
-    sort(inputData.begin(), inputData.end());
-    inputData.erase(unique(inputData.begin(), inputData.end()), inputData.end() );
+
+    // if already sorted ascending or descending
+    if (find_if(transformSteps.begin(), transformSteps.end(), [](processor_step s) { return s == SORT_ASC || s == SORT_DESC; } ) != transformSteps.end()) {
+      // Strategy 1, distinct when the data is presorted (ascending or dscending, same algo)
+      cout << "Strategy 1 - filter out duplicates with presorting" << endl;
+      // 3 ways to remove duplicates with presorting work better depending on number of duplicates
+      // https://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
+      // Once all duplicate elements are shifted at one end of vector, then delete them using the vector::erase()
+
+      // this does not work on unsorted data, because unique() needs consecutive duplicates to remove them
+      inputData.erase(unique(inputData.begin(), inputData.end()), inputData.end() );
+    }
+    else
+      {
+        // Strategy 2, distinct when the data is not presorted
+        cout << "Strategy 2 - filter out duplicates without presorting" << endl;
+        // https://stackoverflow.com/questions/49863158/c-remove-duplicate-values-from-a-vector-without-sorting
+        std::unordered_set<string> set;
+        for (auto it = inputData.begin(); it != inputData.end(); ) {
+          if (set.find(*it) == set.end()) {
+            set.insert(*it);
+            it++;
+          }
+          else {
+            it = inputData.erase(it);
+          }
+        }
+      }
     break;
   }
 }
