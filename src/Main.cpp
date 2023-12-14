@@ -77,10 +77,16 @@ int main(int argc, char* argv[])
     // factory pattern
     // https://en.wikipedia.org/wiki/Factory_method_pattern
 
-    // the strategy is set separately
     ProcessorFactory factory;
     Processor processor = factory.create(sortWordSize || sortWordSizeDesc, sortWordSize ? ASC : DESC, filterDuplicates);
-    //processor.process(input, output)
+    try {
+      processor.process(inputFile, outputFile);
+    }
+    // TODO list relevant exceptions, file access, etc
+    catch(exception& e) {
+      cerr << "Error" << endl;
+      cerr << e.what() << endl;
+    }
   }
   catch(exception& e) {
     cerr << "Error" << endl;
