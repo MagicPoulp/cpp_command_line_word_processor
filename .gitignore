@@ -1,4 +1,6 @@
 boost*
+processor*
+*.txt
 
 # Prerequisites
 *.d
