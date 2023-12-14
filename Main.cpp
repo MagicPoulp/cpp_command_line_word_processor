@@ -33,12 +33,21 @@ int main(int argc, char* argv[])
         po::store(po::parse_command_line(argc, argv, desc), vm);
 
         if (vm.count("help")) {
-            cout << desc << "\n";
+            cout << desc << endl;
             return 0;
         }
-        //cout << "two = " << vm["two"].as<bool>() << "\n";
+        po::notify(vm);
+
+        bool sortWordSize = vm.count("sort-word-size") != 0;
+        bool filterDuplicates = vm.count("filter-duplicates") != 0;
+        cout << "input: " << inputFile << endl;
+        cout << "output: " << outputFile << endl;
+        cout << "sortWordSize: " << std::boolalpha << sortWordSize << endl;
+        cout << "filterDuplicates: " << std::boolalpha << filterDuplicates << endl << endl;
+
     }
     catch(exception& e) {
-        cerr << e.what() << "\n";
+      cerr << "Error" << endl;
+      cerr << e.what() << endl;
     }
 }
