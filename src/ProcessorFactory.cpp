@@ -5,13 +5,13 @@
 
 Processor ProcessorFactory::create(bool sortWordSize, sort_dir sortingDirection, bool filterDuplicates) {
   ProcessorBuilder result;
-  // filtering first, makes the sorting faster
-  if (filterDuplicates) {
-    result.distinct();
-  }
   if (sortWordSize) {
     // 2 parameters become one algo step
     result.sort(sortingDirection);
+  }
+  // having the sorting stepbefore makes distinct faster
+  if (filterDuplicates) {
+    result.distinct();
   }
   return result.build();
 }

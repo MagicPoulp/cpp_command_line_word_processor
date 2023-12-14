@@ -7,7 +7,7 @@
 
 class ProcessorBuilder {
 private:
-  std::vector<processor_step> steps;
+  std::vector<processor_step> transformSteps;
 
 public:
   void sort(sort_dir direction);
