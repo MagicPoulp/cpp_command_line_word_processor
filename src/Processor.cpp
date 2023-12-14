@@ -40,7 +40,7 @@ void Processor::process(const string& input, const string& output) {
     file.close();
   } // else report error
 
-  //processTransformSteps(inputData);
+  processTransformSteps(inputData);
 
   file.open(output, ios::out | std::ios::trunc);
   if(file.is_open()) {
@@ -63,15 +63,24 @@ void Processor::processTransformSteps(vector<string>& inputData) {
   }
 }
 
+// anonymous namespace makes it local
+namespace
+{
+  // adding sorting for equal size creates unique results
+  bool compareStringSize(string s1, string s2) { return s1.size() < s2.size() || (s1.size() == s2.size() && s1 < s2); }
+  bool compareStringSizeDesc(string s1, string s2) { return !compareStringSize(s1, s2); }
+}
+
+
 void Processor::processOneTransformStep(vector<string>& inputData, processor_step step) {
   switch (step) {
   case SORT_ASC:
     cout << "sort ascending" << endl;
-    sort(inputData.begin(), inputData.end());
+    sort(inputData.begin(), inputData.end(), ::compareStringSize);
     break;
   case SORT_DESC:
     cout << "sort descending" << endl;
-    sort(inputData.begin(), inputData.end(), std::greater<string>());
+    sort(inputData.begin(), inputData.end(), ::compareStringSizeDesc);
     break;
   case DISTINCT:
     cout << "filter out duplicates" << endl;
