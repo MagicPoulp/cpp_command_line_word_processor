@@ -13,5 +13,6 @@ It parses options and sorts or filters words given in input.
 
 sudo apt-get install libboost-all-dev
 g++ Main.cpp -o processor -std=c++11 -Iinclude/boost_1_82_0 -lboost_program_options
-./processor -i input.txt -o output.txt --sort-size --filter_duplicates
-
+ou make
+./processor --help
+./processor -i input.txt -o output.txt --sort-word-size --filter-duplicates
